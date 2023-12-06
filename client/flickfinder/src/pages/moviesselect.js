@@ -11,6 +11,8 @@ function MovieSelect() {
   const [movieIndex, setMovieIndex] = useState(0); // Track the current movie index
   const [movies, setMovies] = useState([]);
   const [currentMovieDetails, setCurrentMovieDetails] = useState(null);
+  const [userID, setUserID] = useState('');
+  const [movieID, setMovieID] = useState('');
   const navigate = useNavigate();
 
   const handleImageClick = () => {
@@ -41,6 +43,7 @@ function MovieSelect() {
           coverImage: data[0].coverImage,
           // Add more details as needed
         });
+        setMovieID(data[0].movieID)
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -51,14 +54,23 @@ function MovieSelect() {
     displayMovieData();
   }, []);
 
-  const handleLike = () => {  
-    // Prepare the payload for the API call
+  const handleLike = () => {
+    if (!userID) {
+      alert("Enter username");
+      return;
+    }
+  
     const payload = {
       userId: userID, 
       movieId: movieID
     };
   
-    fetch('http://localhost:3004/likedMovies', { // Replace with your actual backend URL
+    // Move to the next movie before or regardless of the fetch response
+    const newIndex = movieIndex < movies.length - 1 ? movieIndex + 1 : 0;
+    setMovieIndex(newIndex);
+    updateCurrentMovieDetails(newIndex);
+  
+    fetch('http://localhost:3004/api/flickfinder/likedMovies', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,29 +84,31 @@ function MovieSelect() {
       return response.json();
     })
     .then(() => {
-      // Increment movie index and update movie details
-      if (movieIndex < movies.length - 1) {
-        const newIndex = movieIndex + 1;
-        setMovieIndex(newIndex);
-        updateCurrentMovieDetails(newIndex); 
-      }
+      console.log('Like processed successfully');
     })
     .catch(error => {
       console.error('There was a problem with the fetch operation:', error);
       // Handle the error (e.g., show a notification to the user)
     });
   };
+  
 
   const handleDislike = () => {
-    // Increment movie index and update movie details
-    if (movieIndex < movies.length - 1) {
-      setMovieIndex(movieIndex + 1);
-      updateCurrentMovieDetails();
+    if (!userID) {
+      alert("Enter username");
+      return;
+    }
+  
+
+    const newIndex = movieIndex + 1;
+    if (newIndex < movies.length) {
+      setMovieIndex(newIndex);
+      updateCurrentMovieDetails(newIndex);
     }
   };
-
-  const updateCurrentMovieDetails = () => {
-    const nextMovie = movies[movieIndex];
+  
+  const updateCurrentMovieDetails = (newIndex) => {
+    const nextMovie = movies[newIndex];
     setCurrentMovieDetails({
       title: nextMovie.movieName,
       rating: nextMovie.movieMPAA,
@@ -102,18 +116,18 @@ function MovieSelect() {
       genre: nextMovie.movieGenre,
       coverImage: nextMovie.coverImage,
     });
+    setMovieID(nextMovie.movieID);
   };
 
   return (
-    <div className="movie-select-container">
+    <><div className="movie-select-container">
       <h1>{currentMovieDetails?.title}</h1>
       <p>{currentMovieDetails?.rating}</p>
       <img
         src={`${currentMovieDetails?.coverImage}`} // Use the correct property for the image source
         alt="Movie"
         onClick={handleImageClick}
-        className="movie-image"
-      />
+        className="movie-image" />
 
       <div className="buttons-container">
         <button onClick={handleDislike} className="dislike-button">
@@ -130,8 +144,19 @@ function MovieSelect() {
         </Link>
       </div>
 
+      {/* Additional buttons for log out and edit user info */}
+
+
       {modalOpen && <Modal setModalOpen={setModalOpen} movieDetails={currentMovieDetails} />}
-    </div>
+      <input type="text" placeholder="Enter your User Name" value={userID} onChange={(e) => setUserID(e.target.value)} />
+    </div><div className="additional-buttons-container">
+        <Link to="/">
+          <button className="logout-button">Log Out</button>
+        </Link>
+        <Link to="/EditUserInfo">
+          <button className="edit-user-button">Edit User</button>
+        </Link>
+      </div></>
   );
 }
 

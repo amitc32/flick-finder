@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './searchFor.css';
-import Modal from './Modal2'; // Make sure this path is correct
 import { Link } from 'react-router-dom';
 
 function SearchFor() {
@@ -35,12 +34,12 @@ function SearchFor() {
   };
 
   const handleSecondDropdownChange = (e) => {
-    const selectedDirector = e.target.value;
-    setSelectedOption(selectedDirector);
-  
+    const selection = e.target.value;
+    setSelectedOption(selection);
+
     if (searchType === 'directors') {
       // Assuming you have an API endpoint that returns movies for a given director
-      fetch(`http://your-api-endpoint/movies/director/${selectedDirector}`)
+      fetch(`http://localhost:3004/api/flickfinder/movies/director/${selection}`)
         .then(response => response.json())
         .then(data => {
           setCurrentMovieDetails(data); // Assuming the API returns an array of movies
@@ -49,9 +48,15 @@ function SearchFor() {
           console.error('Error fetching data:', error);
         });
     } else if (searchType === 'actors') {
-      // details = mockData.movies.filter(movie =>
-      //   movie.actors.includes(selection)
-      // );
+      // Fetch movies for the selected actor
+      fetch(`http://localhost:3004/api/flickfinder/movies/actor/${selection}`)
+        .then(response => response.json())
+        .then(data => {
+          setCurrentMovieDetails(data); // Assuming the API returns an array of movies
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
     }
   };
 
@@ -85,27 +90,39 @@ function SearchFor() {
               <th>Movie Name</th>
               <th>Photo</th>
               <th>Rating</th>
+              {/* Add other headers as needed */}
             </tr>
           </thead>
           <tbody>
             {currentMovieDetails.map((movie, index) => (
               <tr key={index}>
-                <td>{movie.name}</td>
-                <td><img src={movie.photo} alt={movie.name} onClick={() => showMovieDetails(movie)} /></td>
-                <td>{movie.rating}</td>
+                <td>{movie.movieName}</td>
+                <td>
+                  <img src={movie.coverImage} alt={movie.movieName} onClick={() => showMovieDetails(movie)} />
+                </td>
+                <td>{movie.movieMPAA}</td>
+                {/* Add other data fields as needed */}
               </tr>
             ))}
           </tbody>
         </table>
       )}
-      {modalOpen && (
-        <Modal
-          setModalOpen={setModalOpen}
-          movieDetails={currentMovieDetails[0]} // Pass the first (and in this case, only) movie object to the Modal
-        />
-      )}
+      {/* Additional buttons for log out and edit user info */}
+    <div className="additional-buttons-container">
+      <Link to="/">
+        <button className="logout-button">Log Out</button>
+      </Link>
+      <Link to="/EditUserInfo">
+        <button className="edit-user-button">Edit User</button>
+      </Link>
+      <Link to="/MoviesSelect">
+        <button className="home-button">Return to Swipe</button>
+      </Link>
     </div>
+    </div>
+    
+    
   );
 }
 
-export default SearchFor;
+export default SearchFor

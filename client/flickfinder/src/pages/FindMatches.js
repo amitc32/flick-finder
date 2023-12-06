@@ -126,6 +126,15 @@ function FindMatches() {
         <Link to ='/searchFor'>
         <button  className="navigation-button">Search for Actors/Directors</button>
         </Link>
+          {/* Additional buttons for log out and edit user info */}
+          <div className="additional-buttons-container">
+      <Link to="/">
+        <button className="logout-button">Log Out</button>
+      </Link>
+      <Link to="/EditUserInfo">
+        <button className="edit-user-button">Edit User</button>
+      </Link>
+    </div>
     </div>
 );
 }

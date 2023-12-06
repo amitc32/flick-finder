@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './EditUserInfo.css';
+import { Link } from 'react-router-dom';
 
 function EditUserInfo() {
   const [username, setUsername] = useState('');
@@ -9,18 +10,18 @@ function EditUserInfo() {
   const [oldDisplayName, setOldDisplayName] = useState('');
   const [newDisplayName, setNewDisplayName] = useState('');
   const [confirmNewDisplayName, setConfirmNewDisplayName] = useState('');
-  const [notifications, setNotifications] = useState(false);
+  const [notifications, setNotifications] = useState("Off");
+  const [answer, setAnswer] = useState('');
+
 
   const handleChangePasswordSubmit = async () => {
-    // API call to change the password
-    // Construct the payload
     const payload = {
       userID: username,
       old: oldPassword,
       newp: newPassword,
       confirmPassword: confirmNewPassword
     };
-    console.log('Submitted Password Change:', { oldPassword, newPassword, confirmNewPassword });
+
     try {
       const response = await fetch('http://localhost:3004/api/flickfinder/updatePassword', {
         method: 'POST',
@@ -29,59 +30,94 @@ function EditUserInfo() {
       });
 
       if (!response.ok) {
-        const message = await response.text();
-        throw new Error(message);
+        const text = await response.text(); // Read the response as text instead of JSON
+        throw new Error(text);
       }
 
-      const data = await response.json();
-      console.log('Password Update Response:', data);
-      alert('Password updated successfully!'); // Alert or set a success message in state
+      console.log('Password Update Response: Password Updated Successfully!');
+      alert('Password updated successfully!');
     } catch (error) {
       console.error('Password Update Error:', error);
-      alert(error.message); // Alert oSr set an error message in state
+      alert('Failed to update password: ' + error.message);
     }
-    console.log('Submitting Password Change:', payload);
+    console.log('Submitting Password Change:');
   };
+
 
 
 
   const handleChangeDisplayNameSubmit = async () => {
-   // API call to change the password
-    // Construct the payload
     const payload = {
-        userID: username,
-        old: oldDisplayName,
-        newd: newDisplayName,
-        confirmDisplay: confirmNewDisplayName
-      };
-      console.log('Submitted Password Change:', { oldDisplayName, newDisplayName, confirmNewDisplayName });
-      try {
-        const response = await fetch('http://localhost:3004/api/flickfinder/updateDisplay', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-  
-        if (!response.ok) {
-          const message = await response.text();
-          throw new Error(message);
-        }
-  
-        const data = await response.json();
-        console.log('Display Name Update Response:', data);
-        alert('Display Name updated successfully!'); // Alert or set a success message in state
-      } catch (error) {
-        console.error('Display Name Update Error:', error);
-        alert(error.message); // Alert or set an error message in state
+      userID: username,
+      old: oldDisplayName,
+      newd: newDisplayName,
+      confirmDisplay: confirmNewDisplayName
+    };
+
+    try {
+      const response = await fetch('http://localhost:3004/api/flickfinder/updateDisplay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const text = await response.text(); // Read the response as text instead of JSON
+        throw new Error(text);
       }
-      console.log('Submitting Display Name Change:', payload);
+
+      console.log('Display Name Update Response: Display Name Updated Successfully!');
+      alert('Display Name updated successfully!');
+    } catch (error) {
+      console.error('Display Name Update Error:', error);
+      alert('Failed to update Disaplay Name: ' + error.message);
+    }
+    console.log('Submitting Disaplay Name Change:');
   };
 
-  const toggleNotifications = () => {
-    setNotifications(!notifications);
-    // API call to toggle notifications
-    console.log('Notifications:', notifications ? 'On' : 'Off');
+  const toggleNotifications = async () => {
+    let payload ={}
+    if (!username) {
+      alert('Please enter a username.');
+      return;
+    }
+    if(notifications == "On"){
+      payload = {
+        userID: username,
+        answer: 1
+      };
+    }
+    if(notifications == "Off"){
+      payload = {
+        userID: username,
+        answer: 0
+      };
+    }
+  
+
+    try {
+      const response = await fetch('http://localhost:3004/api/flickfinder/updateNoti', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const text = await response.text(); // Read the response as text instead of JSON
+        throw new Error(text);
+      }
+
+      console.log('Notification Settings Update Response: Password Updated Successfully!');
+      alert('Notification Settings updated successfully!');
+    } catch (error) {
+      console.error('Notification Settings Update Error:', error);
+      alert('Failed to update Notification Settings: ' + error.message);
+    }
+    console.log('Submitting Notification Settings Change:');
+  
   };
+  
+
 
   return (
     <div className="edit-user-container">
@@ -107,10 +143,25 @@ function EditUserInfo() {
 
       <div className="edit-section">
         <h3>Notifications:</h3>
-        <label className="switch">
-          <input type="checkbox" checked={notifications} onChange={toggleNotifications} />
-          <span className="slider round"></span>
-        </label>
+        <select
+          value={notifications}
+          onChange={(e) => setNotifications(e.target.value)}
+          className="notification-select"
+        >
+          <option value="On">On</option>
+          <option value="Off">Off</option>
+        </select>
+        <button onClick={toggleNotifications} className="submit-button">Submit</button>
+      </div>
+      {/* Additional buttons for log out and edit user info */}
+      <div className="additional-buttons-container">
+        <Link to="/">
+          <button className="logout-button">Log Out</button>
+        </Link>
+        
+        <Link to="/moviesSelect">
+          <button className="home-button">Return to Swipe</button>
+        </Link>
       </div>
     </div>
   );

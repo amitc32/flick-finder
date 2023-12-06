@@ -60,25 +60,6 @@ router.route('/:movieID/movie')
     });
   })
 
-router.route('/:movieID/movie')
-  .post((req, res) => {
-    const movieID = req.params.movieID;
-    const query = `
-      SELECT movieName, coverImage
-      FROM movie
-      WHERE movieID = '${movieID}'
-    `;
-
-    connection.query(query, (error, results) => {
-      if (error) {
-        res.status(500).send('Error executing query');
-        return;
-      }
-      console.log('success')
-      res.json(results);
-    });
-  })
-
 router.route('/movie/:movieID/actors').get((req, res) => {
   const movieID = req.params.movieID;
 
@@ -189,20 +170,39 @@ router.route('/movies')
     });
   });
 
-router.post('/likedMovies', (req, res) => {
-  const { userId, movieId } = req.body;
-  const query = `INSERT INTO likedMovies (userID, movieID) VALUES (?, ?);`;
-
-  connection.query(query, [userId, movieId], (error, results) => {
-    if (error) {
-      console.error('Error executing query:', error);
-      res.status(500).send('Error executing query');
-      return;
-    }
-    console.log('Insertion successful');
-    res.status(201).json(results);
+  router.post('/likedMovies', (req, res) => {
+    const { userId, movieId } = req.body;
+  
+    // Check if the like already exists
+    const checkQuery = `SELECT * FROM likedMovies WHERE userID = ? AND movieID = ?;`;
+  
+    connection.query(checkQuery, [userId, movieId], (checkError, checkResults) => {
+      if (checkError) {
+        console.error('Error executing check query:', checkError);
+        res.status(500).send('Error executing check query');
+        return;
+      }
+  
+      if (checkResults.length > 0) {
+        // The like already exists
+        console.log('Like already exists');
+        res.status(200).send('Like already exists');
+      } else {
+        // Insert the new like
+        const insertQuery = `INSERT INTO likedMovies (userID, movieID) VALUES (?, ?);`;
+        connection.query(insertQuery, [userId, movieId], (insertError, insertResults) => {
+          if (insertError) {
+            console.error('Error executing insert query:', insertError);
+            res.status(500).send('Error executing insert query');
+            return;
+          }
+          console.log('Insertion successful');
+          res.status(201).json(insertResults);
+        });
+      }
+    });
   });
-});
+  
 
 router.post('/updatePassword', (req, res) => {
   const { userID, old, newp, confirmPassword } = req.body;
@@ -251,7 +251,7 @@ router.post('/updateDisplay', (req, res) => {
     return res.status(400).send('Please fill out all fields');
   }
 
-  if (newp !== confirmPassword) {
+  if (newd !== confirmDisplay) {
     return res.status(400).send('New display names do not match');
   }
 
@@ -285,13 +285,13 @@ router.post('/updateDisplay', (req, res) => {
 });
 
 router.post('/updateNoti', (req, res) => {
-  const { userID, bool } = req.body;
+  const { userID, answer } = req.body;
 
-  if (!userID || !bool) {
-    return res.status(400).send('Please fill out all fields');
+  if (!userID || answer === undefined || answer === null || (answer !== 0 && answer !== 1)) {
+    return res.status(400).send('Please fill out all fields with valid data');
   }
 
-connection.query('UPDATE users SET notifications = ? WHERE username = ?', [bool, userID], (updateError, updateResults) => {
+connection.query('UPDATE users SET notifications = ? WHERE username = ?', [answer, userID], (updateError, updateResults) => {
     if (updateError) {
       console.error('Error executing update query:', updateError);
       return res.status(500).send('Error executing update query');
@@ -303,7 +303,7 @@ connection.query('UPDATE users SET notifications = ? WHERE username = ?', [bool,
 
 
 // Helper function
-function ismMatching(providedPassword, storedPassword) {
+function isMatching(providedPassword, storedPassword) {
   // In this case, a direct comparison is made since we're not using hashed passwords.
   return providedPassword === storedPassword;
 }
@@ -348,6 +348,27 @@ router.route('/directors')
     `;
 
     connection.query(query, [directorName], (error, results) => {
+      if (error) {
+        console.error('Error executing query:', error);
+        res.status(500).send('Error executing query');
+        return;
+      }
+      res.json(results);
+    });
+  });
+
+  router.route('/movies/actor/:actorName')
+  .get((req, res) => {
+    const actorName = req.params.actorName;
+    const query = `
+      SELECT m.* 
+      FROM movie m
+      JOIN movieactor ma ON m.movieID = ma.movieID
+      JOIN actor a ON ma.actorID = a.actorID
+      WHERE a.actorName = ? LIMIT 50;
+    `;
+
+    connection.query(query, [actorName], (error, results) => {
       if (error) {
         console.error('Error executing query:', error);
         res.status(500).send('Error executing query');

@@ -1,70 +1,67 @@
-# Getting Started with Create React App
+Below is the complete README content for FlickFinder, including setup instructions, packages to install, and an overview of the application's functionality.
+markdown
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# FlickFinder
 
-## Available Scripts
+## Introduction
 
-In the project directory, you can run:
+FlickFinder is a Tinder-inspired web application tailored for movie enthusiasts. It allows users to register or log in, like or dislike movies, and find matches based on common preferences. Users can view mutual likes at `/moviesselect`, search for movies related to certain actors or directors at `/searchFor`, and manage their account settings at `/EditUserInfo`.
 
-### `npm start`
+## Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+To get the application up and running, you'll need to install dependencies for both the frontend and backend components.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Prerequisites
 
-### `npm test`
+Ensure you have Node.js and npm installed on your machine. You can download them from [Node.js official website](https://nodejs.org/).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Overall Setup
 
-### `npm run build`
+Start by cloning the project repository to your local machine. Once cloned, navigate to the project directory.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Backend Installation
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+In the backend directory, install the required Node.js modules:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+npm install body-parser, cors, express, mysq,l mysql2, nodemon
 
-### `npm run eject`
+These packages are necessary for the backend server functionality:
+body-parser: To parse incoming request bodies.
+cors: To enable Cross-Origin Resource Sharing for AJAX requests.
+express: The web server framework.
+mysql & mysql2: To connect to and communicate with the MySQL database.
+nodemon: For automatically restarting the server on code changes.
+Run the backend server using:
+bash
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Cd flick-finder
+Cd server
+Node index
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Replace start with the script specified in your package.json that starts the server.
+Frontend Installation
+In the frontend directory, install React and other dependencies:
+bash
+Cd flick-finder
+Cd client
+Cd flickfinder
+npm install react react-router-dom
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+The react-router-dom package provides DOM bindings for React Router.
+To launch the frontend application, execute:
+Cd flick-finder
+Cd client
+Cd flickfinder
+npm start
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Features
+Authentication: Users can sign up for a new account or log in with existing credentials.
+Movie Swiping: The /moviesselect route presents a collection of movies for users to like or dislike.
+Match Finding: By entering usernames at /FindMatches, users can discover movies liked by both parties.
+Movie Search: The /searchFor feature allows users to explore movies linked to particular actors or directors.
+User Profile Management: At /EditUserInfo, users can update their password, display name, and notification preferences.
+Usage
+After setting up the project, access the application via a web browser. Navigate to the corresponding routes to utilize the different functionalities outlined above. You can also access different routes using the various buttons and functions on each page.
+For any additional help or to report issues, please reach out to the project maintainers or submit an issue in the project repository.
+Thank you for using FlickFinder, and enjoy your movie discovery journey!

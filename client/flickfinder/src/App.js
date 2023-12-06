@@ -4,7 +4,7 @@ import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import MovieSelect from './pages/moviesselect';
 import FindMatches from './pages/FindMatches';
-import searchFor from './pages/searchFor';
+import SearchFor from './pages/searchFor';
 
 function App() {
   return (
@@ -14,8 +14,8 @@ function App() {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/moviesselect" element={<MovieSelect />} />
-        <Route path="/findmatches" element={<FindMatches />} />
-        <Route path="/searchfor" element={<searchFor />} />
+        <Route path="/searchfor" element={<SearchFor />} />
+        <Route path="/FindMatches" element={<FindMatches />} />
         
       </Routes>
     </Router>

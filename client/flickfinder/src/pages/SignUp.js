@@ -3,46 +3,54 @@ import { useNavigate } from 'react-router-dom';
 import './pages.css';
 
 function SignUp() {
-  const [regName, setRegName] = useState('');
-  const [regEmail, setRegEmail] = useState('');
-  const [regPassword, setRegPassword] = useState('');
-  const [regConfirmPassword, setRegConfirmPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const navigate = useNavigate();
 
-  const handleRegisterSubmit = async (event) => {
+  const navigate = useNavigate(); // Add this line to get the navigate function
+
+  async function handleRegisterSubmit(event) {
     event.preventDefault();
 
-    if (!regName || !regEmail || !regPassword || !regConfirmPassword) {
+    if (!username || !email || !password || !confirmPassword || !displayName) {
       setErrorMessage('Please enter all fields');
       return;
     }
 
-    if (regPassword !== regConfirmPassword) {
+    if (password !== confirmPassword) {
       setErrorMessage('Passwords do not match');
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:3004/user/register', {
+      const response = await fetch('http://localhost:3004/api/flickfinder/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: regName, email: regEmail, password: regPassword })
+        body: JSON.stringify({
+           username: username, 
+           email: email, 
+           password: password, 
+           confirmPassword: confirmPassword,
+           displayName: displayName,
+          }), 
       });
+      //console.log(response)
 
       if (!response.ok) {
         throw new Error('Registration failed');
       }
 
-      const data = await response.json();
-      console.log('Registration successful:', data);
-      navigate('/sign-in'); // Redirect to sign-in page
+      console.log('Registration successful');
+      setErrorMessage("Success!")
+      navigate('/sign-in'); 
     } catch (error) {
-      console.error('Registration error:', error);
+      console.log('Registration error');
       setErrorMessage(error.message);
     }
   };
-
   return (
     <div className="App">
       <header className="App-header">
@@ -50,30 +58,37 @@ function SignUp() {
         <form onSubmit={handleRegisterSubmit}>
           <input 
             type="text" 
-            placeholder="Nickname" 
-            value={regName}
-            onChange={(e) => setRegName(e.target.value)}
+            placeholder="Full Name" 
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="App-input"
+          />
+          <input 
+            type="text" 
+            placeholder="Display Name/Username" 
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
             className="App-input"
           />
           <input 
             type="email" 
             placeholder="Email" 
-            value={regEmail}
-            onChange={(e) => setRegEmail(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="App-input"
           />
           <input 
             type="password" 
             placeholder="Password" 
-            value={regPassword}
-            onChange={(e) => setRegPassword(e.target.value)}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="App-input"
           />
           <input 
             type="password" 
             placeholder="Confirm Password" 
-            value={regConfirmPassword}
-            onChange={(e) => setRegConfirmPassword(e.target.value)}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             className="App-input"
           />
           <button type="submit" className="App-button">Sign Up</button>

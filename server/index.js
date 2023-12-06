@@ -4,7 +4,9 @@ const app = express();
 const port = 3004;
 const router = express.Router();
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
+app.use(cors());
 
 app.use(bodyParser.json());
 const connection = mysql.createConnection({
@@ -43,6 +45,25 @@ router.route('/users')
 
   router.route('/:movieID/movie')
   .get((req, res) =>{
+    const movieID = req.params.movieID;
+    const query =  `
+      SELECT movieName, coverImage
+      FROM movie
+      WHERE movieID = '${movieID}'
+    `;
+
+    connection.query(query, (error, results) =>{
+      if(error) {
+        res.status(500).send('Error executing query');
+        return;
+      }
+      console.log('success')
+      res.json(results);
+    });
+  })
+
+  router.route('/:movieID/movie')
+  .post((req, res) =>{
     const movieID = req.params.movieID;
     const query =  `
       SELECT movieName, coverImage
@@ -108,43 +129,68 @@ router.route('/movie/:movieID/actors').get((req, res) => {
   });
 
 
-  router.route('/register')
-  .post((req, res) => {
-    const { username, email, password, confirmPassword, displayName } = req.body;
 
+
+  router.route('/register').post((req, res) => {
+    const { username, email, password, confirmPassword, displayName } = req.body;
+  
     if (!username || !email || !password || !confirmPassword || !displayName) {
       return res.status(400).send('Please fill out all fields');
     }
-
+  
     if (password !== confirmPassword) {
       return res.status(400).send('Passwords do not match');
     }
-
-    // Insert the user into the users table
-    const insertQuery = 'INSERT INTO users (username, email, Pwd, displayName) VALUES (?, ?, ?, ?);';
-
-    connection.query(insertQuery, [username, email, password], (insertError, insertResults) => {
-      if (insertError) {
-        console.error('Error inserting user:', insertError);
-        return res.status(500).send('Error registering user');
+  
+    const checkEmailQuery = 'SELECT email FROM users WHERE email = ?';
+    connection.query(checkEmailQuery, [email], (emailCheckError, emailCheckResults) => {
+      if (emailCheckError) {
+        console.log('Error checking email');
+        return res.status(500).send('Error checking email');
       }
+  
+      if (emailCheckResults.length > 0) {
+        return res.status(400).send('Email or username is already in use');
+      }
+  
+      const insertQuery = 'INSERT INTO users (username, email, Pwd, displayName) VALUES (?, ?, ?, ?)';
+      connection.query(insertQuery, [username, email, password, displayName], (insertError, insertResults) => {
+        if (insertError) {
+          console.log('Error inserting user');
+          return res.status(500).send('Error registering user');
+        }
+  
+        console.log('User registered successfully');
+        res.status(200).send('User registered successfully');
+      });
+    });
+  });
+  
 
-      console.log('User registered successfully');
-      res.status(200).send('User registered successfully');
+
+
+
+
+  router.route('/:user/liked')
+  .get((req, res) => {
+    const { user } = req.params;
+    const query = `SELECT MovieId FROM likedmovies WHERE UserID = ?`;
+
+    connection.query(query, [user], (error, results) => {
+      if (error) {
+        console.error('Error executing query:', error);
+        res.status(500).send('Error executing query');
+        return;
+      }
+      console.log('Query successful');
+      res.json(results);
     });
   });
 
 
-
-
-router.route('/:user/liked')
+router.route('/movies')
   .get((req, res) =>{
-    const user = req.params.user
-    const query =  `
-      SELECT MovieId
-      FROM likedmovies
-      WHERE UserID = '${user}'
-    `;
+    const query = `SELECT * FROM movie;`;
     connection.query(query, (error, results) =>{
       if(error) {
         res.status(500).send('Error executing query');
@@ -154,6 +200,20 @@ router.route('/:user/liked')
       res.json(results);
     });
   });
+  router.post('/likedMovies', (req, res) => {
+    const { userId, movieId } = req.body;
+    const query = `INSERT INTO likedMovies (userID, movieID) VALUES (?, ?);`;
+
+    connection.query(query, [userId, movieId], (error, results) => {
+      if (error) {
+        console.error('Error executing query:', error);
+        res.status(500).send('Error executing query');
+        return;
+      }
+      console.log('Insertion successful');
+      res.status(201).json(results);
+    });
+});
 
   
 

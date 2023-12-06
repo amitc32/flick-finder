@@ -17,7 +17,7 @@ function SignIn() {
     }
 
     try {
-      const response = await fetch('http://localhost:3004/user/login', {
+      const response = await fetch('http://localhost:3004/api/flickfinder/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -29,7 +29,7 @@ function SignIn() {
 
       const data = await response.json();
       console.log('Login successful:', data);
-      navigate('/'); // Redirect to main page or dashboard
+      navigate('/moviesselect'); // Redirect to the movie selection page
     } catch (error) {
       console.error('Login error:', error);
       setErrorMessage('Failed to login');

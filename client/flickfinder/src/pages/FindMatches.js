@@ -1,5 +1,6 @@
 // src/components/FindMatches.js
 import React, { useState, useEffect } from 'react';
+import './FindMatches.css';
 
 
 function FindMatches() {
@@ -13,9 +14,12 @@ function FindMatches() {
 
   const findMatchingMovies = async (user1, user2) => {
     try {
+      console.log("user1: "+user1);
+      console.log("user2: "+user2);
       // Make API requests to your Express.js server with user1 and user2 usernames
-      const response1 = await fetch(`/user/${user1}/liked`);
-      const response2 = await fetch(`/user/${user2}/liked`);
+      const response1 = await fetch(`http://localhost:3004/api/flickfinder/${user1}/liked`);
+      const response2 = await fetch(`http://localhost:3004/api/flickfinder/${user2}/liked`);
+      
 
       if (!response1.ok || !response2.ok) {
         throw new Error('Failed to fetch data from the server');
@@ -23,6 +27,8 @@ function FindMatches() {
 
       const data1 = await response1.json();
       const data2 = await response2.json();
+      console.log("data1: "+data1 );
+      console.log("data2: "+data2 );
 
       // Extract MovieIds from the API responses
       const movieIds1 = data1.map((item) => item.MovieId);
@@ -43,27 +49,29 @@ function FindMatches() {
   };
 
   useEffect(() => {
-    // When matchingMovieIds change, fetch movie details for the matching movies
     const fetchMatchingMovieDetails = async () => {
       try {
-        const movieDetails = [];
-
-        for (let i = 0; i < matchingMovieIds.length; i++) {
-          const response = await fetch(`/movie/${matchingMovieIds[i]}/movie`);
-          if (response.ok) {
-            const data = await response.json();
-            movieDetails.push(data[0]); // Assuming the response is an array with one object
-          }
-        }
-
-        setMatchingMovies(movieDetails);
+        const fetchPromises = matchingMovieIds.map(movieId =>
+          fetch(`http://localhost:3004/api/flickfinder/${movieId}/movie`).then(response => {
+            if (response.ok) return response.json();
+            throw new Error(`Failed to fetch details for movie ID: ${movieId}`);
+          })
+        );
+  
+        const moviesDetailsResponses = await Promise.all(fetchPromises);
+        const moviesDetails = moviesDetailsResponses.map(response => response[0]);
+        setMatchingMovies(moviesDetails);
       } catch (error) {
         console.error('Error fetching movie details:', error);
+        // Handle how this error is presented to the user
       }
     };
-
-    fetchMatchingMovieDetails();
+  
+    if (matchingMovieIds.length > 0) {
+      fetchMatchingMovieDetails();
+    }
   }, [matchingMovieIds]);
+  
 
   const navigateToNextMovie = () => {
     setCurrentMovieIndex((prevIndex) => (prevIndex + 1) % matchingMovies.length);
@@ -95,7 +103,7 @@ function FindMatches() {
           placeholder="Enter partner's username"
         />
       </div>
-      <button onClick={findMatchingMovies}>Find Matches</button>
+      <button onClick={() => findMatchingMovies(username1, username2)}>Find Matches</button>
 
       {matchingMovies.length > 0 && (
         <div>

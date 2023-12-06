@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import Modal from './Modal'; // You'll need to create this component
-import './MovieSelect.css'; // You'll need to create this CSS file
+import Modal from './Modal';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import './MovieSelect.css';
 
 function MovieSelect() {
   const [modalOpen, setModalOpen] = useState(false);
   const [movieTitle] = useState('Example Movie Title'); // Replace with actual data
   const [movieRating] = useState('4.5/5'); // Replace with actual data
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleImageClick = () => {
-    // Function to handle the movie image click
     setModalOpen(true);
   };
 
@@ -18,6 +19,12 @@ function MovieSelect() {
 
   const handleDislike = () => {
     console.log('Dislike button clicked');
+  };
+
+  // Function to handle navigation and log to console
+  const goToFindMatches = () => {
+    console.log('Navigating from MovieSelect to FindMatches');
+    navigate('/FindMatches'); // Use the navigate function
   };
 
   return (
@@ -34,12 +41,16 @@ function MovieSelect() {
         <button onClick={handleDislike} className="dislike-button">
           Dislike
         </button>
+        <button onClick={goToFindMatches} className="find-matches-button">
+          Find Matches
+        </button>
         <button onClick={handleLike} className="like-button">
           Like
         </button>
+        {/* Add a button to navigate to FindMatches */}
+        
       </div>
 
-      {/* Modal for more movie information */}
       {modalOpen && <Modal setModalOpen={setModalOpen} />}
     </div>
   );

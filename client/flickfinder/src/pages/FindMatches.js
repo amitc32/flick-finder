@@ -1,5 +1,6 @@
 // src/components/FindMatches.js
 import React, { useState, useEffect } from 'react';
+import {Link} from 'react-router-dom';
 import './FindMatches.css';
 
 
@@ -84,41 +85,46 @@ function FindMatches() {
   };
 
   return (
-    <div>
-      <div>
-        <label>Your Username:</label>
-        <input
-          type="text"
-          value={username1}
-          onChange={(e) => setUsername1(e.target.value)}
-          placeholder="Enter your username"
-        />
-      </div>
-      <div>
-        <label>Username of Partner:</label>
-        <input
-          type="text"
-          value={username2}
-          onChange={(e) => setUsername2(e.target.value)}
-          placeholder="Enter partner's username"
-        />
-      </div>
-      <button onClick={() => findMatchingMovies(username1, username2)}>Find Matches</button>
-
-      {matchingMovies.length > 0 && (
-        <div>
-          <h2>{matchingMovies[currentMovieIndex].movieName}</h2>
-          <img
-            src={matchingMovies[currentMovieIndex].coverImage}
-            alt={matchingMovies[currentMovieIndex].movieName}
-          />
-          <button onClick={navigateToPreviousMovie}>Previous</button>
-          <button onClick={navigateToNextMovie}>Next</button>
+    <div className="find-matches-container">
+        <div className="input-container">
+            <label htmlFor="username1">Your Username:</label>
+            <input
+                id="username1"
+                type="text"
+                value={username1}
+                onChange={(e) => setUsername1(e.target.value)}
+                placeholder="Enter your username"
+            />
+            <label htmlFor="username2">Username of Partner:</label>
+            <input
+                id="username2"
+                type="text"
+                value={username2}
+                onChange={(e) => setUsername2(e.target.value)}
+                placeholder="Enter partner's username"
+            />
+            <button onClick={() => findMatchingMovies(username1, username2)}>Find Matches</button>
         </div>
-      )}
 
+        {matchingMovies.length > 0 && (
+            <div className="movie-card">
+                <h2>{matchingMovies[currentMovieIndex].movieName}</h2>
+                <img
+                    src={matchingMovies[currentMovieIndex].coverImage}
+                    alt={matchingMovies[currentMovieIndex].movieName}
+                />
+                <div className="buttons-container">
+                    <button onClick={navigateToPreviousMovie} className="navigation-button">Previous</button>
+                    <button onClick={navigateToNextMovie} className="navigation-button">Next</button>
+                </div>
+            </div>
+            
+        )}
+        <Link to ='/moviesselect'>
+        <button onClick={navigateToPreviousMovie} className="navigation-button">Back to Swiping</button>
+        </Link>
     </div>
-  );
+);
 }
 
 export default FindMatches;

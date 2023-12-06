@@ -121,7 +121,10 @@ function FindMatches() {
             
         )}
         <Link to ='/moviesselect'>
-        <button onClick={navigateToPreviousMovie} className="navigation-button">Back to Swiping</button>
+        <button  className="navigation-button">Back to Swiping</button>
+        </Link>
+        <Link to ='/searchFor'>
+        <button  className="navigation-button">Search for Actors/Directors</button>
         </Link>
     </div>
 );

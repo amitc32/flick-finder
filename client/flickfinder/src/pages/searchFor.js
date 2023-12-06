@@ -1,17 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './searchFor.css';
 import Modal from './Modal2'; // Make sure this path is correct
-
-// Mock data for demonstration
-const mockData = {
-  directors: ['Steven Spielberg', 'Christopher Nolan'],
-  actors: ['Tom Hanks', 'Leonardo DiCaprio'],
-  movies: [
-    { name: 'Inception', director: 'Christopher Nolan', actors: ['Leonardo DiCaprio'], photo: 'https://static.wikia.nocookie.net/unanything/images/a/a2/TheGummyBear.png/revision/latest?cb=20230920192229', rating: '8.8', details: 'Inception details...' },
-    { name: 'Catch Me If You Can', director: 'Steven Spielberg', actors: ['Leonardo DiCaprio', 'Tom Hanks'], photo: 'https://static.wikia.nocookie.net/unanything/images/a/a2/TheGummyBear.png/revision/latest?cb=20230920192229', rating: '8.1', details: 'Catch Me If You Can details...' },
-    // Add more movie objects as needed for your mock data...
-  ]
-};
+import { Link } from 'react-router-dom';
 
 function SearchFor() {
   const [searchType, setSearchType] = useState('');
@@ -22,29 +12,48 @@ function SearchFor() {
 
   const handleSearchTypeChange = (e) => {
     setSearchType(e.target.value);
-    // Set the options for the second dropdown based on the first selection
-    setSecondDropdownOptions(mockData[e.target.value] || []);
-    setCurrentMovieDetails([]); // Reset movie details when changing search type
+
+    // Make an API request to fetch data from the server
+    fetch(`http://localhost:3004/api/flickfinder/${e.target.value}`) // Adjust the endpoint to match your server's routes
+      .then((response) => response.json())
+      .then((data) => {
+        let options;
+        if (e.target.value === 'directors') {
+          // Map over the data if the search type is directors
+          options = data.map(item => item.movieDirector);
+        } else if (e.target.value === 'actors') {
+          // Map over the data if the search type is actors
+          options = data.map(item => item.actorName);
+        }
+        setSecondDropdownOptions(options);
+        setCurrentMovieDetails([]); // Reset movie details when changing search type  
+      })
+
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
   };
 
   const handleSecondDropdownChange = (e) => {
-    const selection = e.target.value;
-    setSelectedOption(selection);
-
-    // Filter the details by checking if the corresponding property is a string or array
-    let details;
-    if (searchType === 'directors') {
-      details = mockData.movies.filter(movie =>
-        movie.director === selection
-      );
-    } else if (searchType === 'actors') {
-      details = mockData.movies.filter(movie =>
-        movie.actors.includes(selection)
-      );
-    }
+    const selectedDirector = e.target.value;
+    setSelectedOption(selectedDirector);
   
-    setCurrentMovieDetails(details);
-};
+    if (searchType === 'directors') {
+      // Assuming you have an API endpoint that returns movies for a given director
+      fetch(`http://your-api-endpoint/movies/director/${selectedDirector}`)
+        .then(response => response.json())
+        .then(data => {
+          setCurrentMovieDetails(data); // Assuming the API returns an array of movies
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+    } else if (searchType === 'actors') {
+      // details = mockData.movies.filter(movie =>
+      //   movie.actors.includes(selection)
+      // );
+    }
+  };
 
   const showMovieDetails = (movie) => {
     setCurrentMovieDetails([movie]); // Wrap movie in an array to ensure it is the correct type
@@ -89,7 +98,7 @@ function SearchFor() {
           </tbody>
         </table>
       )}
-    {modalOpen && (
+      {modalOpen && (
         <Modal
           setModalOpen={setModalOpen}
           movieDetails={currentMovieDetails[0]} // Pass the first (and in this case, only) movie object to the Modal

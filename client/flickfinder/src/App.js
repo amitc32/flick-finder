@@ -5,6 +5,7 @@ import SignUp from './pages/SignUp';
 import MovieSelect from './pages/moviesselect';
 import FindMatches from './pages/FindMatches';
 import SearchFor from './pages/searchFor';
+import EditUserInfo from './pages/EditUserInfo';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/moviesselect" element={<MovieSelect />} />
         <Route path="/searchfor" element={<SearchFor />} />
         <Route path="/FindMatches" element={<FindMatches />} />
+        <Route path="/EditUserInfo" element={<EditUserInfo />} />
         
       </Routes>
     </Router>

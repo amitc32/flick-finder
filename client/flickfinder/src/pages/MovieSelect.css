@@ -1,14 +1,13 @@
-/* MovieSelect.css */
-
 .movie-select-container {
   text-align: center;
   border: 2px solid #eaeaea;
   padding: 16px;
-  max-width: 300px;
+  max-width: 300px; 
   margin: 0 auto;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden; 
 }
 
 .movie-image {
@@ -31,15 +30,20 @@
 
 .buttons-container {
   margin-top: 16px;
+  display: flex; 
+  flex-wrap: wrap; 
+  justify-content: center; 
 }
 
 .dislike-button,
-.like-button {
+.like-button,
+.find-matches-button,
+.SearchTalent-button {
   padding: 10px 20px;
   font-size: 16px;
   border: none;
   border-radius: 4px;
-  margin-right: 10px;
+  margin: 5px; /* Adjusted margin */
   cursor: pointer;
   outline: none;
   transition: background-color 0.2s ease-in-out;
@@ -64,14 +68,6 @@
 }
 
 .find-matches-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 4px;
-  margin-top: 10px;
-  cursor: pointer;
-  outline: none;
-  transition: background-color 0.2s ease-in-out;
   background-color: #008CBA;
   color: #fff;
 }
@@ -79,4 +75,3 @@
 .find-matches-button:hover {
   background-color: #005f6b;
 }
-
